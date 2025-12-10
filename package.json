@@ -12,7 +12,8 @@
     "url": "https://github.com/pontusvision"
   },
   "contributors": [
-    "Leo Martins <lmartins@pontusvision.com> (https://github.com/pontusvision)"
+    "Leo Martins <lmartins@pontusvision.com> (https://github.com/pontusvision)",
+    "Marek Paulson <marek@paulson.ee> (https://github.com/paulsoning)"
   ],
   "types": "dist/lib/pv-smb2.d.ts",
   "main": "dist/lib/pv-smb2.js",
