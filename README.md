@@ -42,14 +42,115 @@ No async calls supported yet; there's a skeleton for a read function, but much m
 
 
 ### Sync calls
-```typescript
 
+#### Reading Files
+
+```typescript
 import {PvDirent,PvNodeSmb2} from 'pv-node-smb2'
 
 const smb2Client = new PvNodeSmb2('workgroup', 'user', 'password')
 
-const content = await smb2Client.readFileSync('smb://<host or IP>/Windows Path/goes/here/foo.txt')
-console.log(content.toString('base64')
+// Read a file from SMB share
+const content = smb2Client.readFileSync('smb://<host or IP>/Windows Path/goes/here/foo.txt')
+console.log(content.toString('base64'))
+// or
+console.log(content.toString('utf8'))
+```
+
+#### Getting File Information
+
+```typescript
+// Get file metadata
+const fileInfo: PvDirent = smb2Client.fileInfo('smb://<host or IP>/Windows Path/goes/here/foo.txt')
+console.log(`File: ${fileInfo.name}`)
+console.log(`Size: ${fileInfo.size} bytes`)
+console.log(`Is File: ${fileInfo.isFile}`)
+console.log(`Is Directory: ${fileInfo.isDir}`)
+console.log(`Modified: ${fileInfo.mtime}`)
+console.log(`Created: ${fileInfo.btime}`)
+```
+
+#### Reading Directories
+
+```typescript
+// Read directory contents
+const entries: PvDirent[] = smb2Client.readDir('smb://<host or IP>/Windows Path/goes/here/')
+entries.forEach(entry => {
+  console.log(`${entry.isDir ? '[DIR]' : '[FILE]'} ${entry.name} (${entry.size} bytes)`)
+})
+```
+
+#### Writing Files
+
+```typescript
+// Write a buffer to SMB share (overwrites if file exists)
+const dataBuffer = Buffer.from("Hello, World!", "utf8")
+const bytesWritten = smb2Client.writeFileSync('smb://<host or IP>/Windows Path/goes/here/foo.txt', dataBuffer)
+console.log(`Written ${bytesWritten} bytes`)
+```
+
+#### Renaming/Moving Files
+
+```typescript
+// Rename or move a file on SMB share
+const result = smb2Client.renameFileSync(
+  'smb://<host or IP>/Windows Path/goes/here/foo.txt',
+  'smb://<host or IP>/Windows Path/goes/here/bar.txt'
+)
+// Returns 0 if successful
+```
+
+#### Deleting Files
+
+```typescript
+// Delete a file from SMB share
+const result = smb2Client.unlinkFileSync('smb://<host or IP>/Windows Path/goes/here/foo.txt')
+// or use the alias
+const result2 = smb2Client.deleteFileSync('smb://<host or IP>/Windows Path/goes/here/bar.txt')
+// Returns 0 if successful
+```
+
+#### Complete Example
+
+```typescript
+import {PvDirent, PvNodeSmb2} from 'pv-node-smb2'
+
+const smb2Client = new PvNodeSmb2('workgroup', 'user', 'password')
+
+try {
+  // Read a file
+  const content = smb2Client.readFileSync('smb://server/share/file.txt')
+  console.log(content.toString('utf8'))
+  
+  // Get file info
+  const info = smb2Client.fileInfo('smb://server/share/file.txt')
+  console.log(`File size: ${info.size} bytes`)
+  
+  // List directory
+  const entries = smb2Client.readDir('smb://server/share/')
+  entries.forEach(entry => {
+    console.log(entry.name)
+  })
+  
+  // Write a file
+  const data = Buffer.from('Hello from Node.js!', 'utf8')
+  smb2Client.writeFileSync('smb://server/share/newfile.txt', data)
+  
+  // Rename a file
+  smb2Client.renameFileSync(
+    'smb://server/share/newfile.txt',
+    'smb://server/share/renamed.txt'
+  )
+  
+  // Delete a file
+  smb2Client.unlinkFileSync('smb://server/share/renamed.txt')
+  
+} catch (error) {
+  console.error('SMB operation failed:', error)
+} finally {
+  // Clean up connection
+  smb2Client.deleteContext()
+}
 ```
 
 
@@ -61,6 +162,7 @@ Each instance of the PvNodeSmb2 class will have its own connection.
 ## Contributors
 
 - [Leo Martins](https://github.com/pontusvision)
+- [Marek](https://github.com/paulsoning)
 
 ## References
 
