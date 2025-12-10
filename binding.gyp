@@ -4,29 +4,45 @@
       "target_name": "pv",
       "sources": [ 
         "src/binding.c"
-        # "src/async.h",
-        # "src/addon.c",
-        # "src/async.cc" 
       ],
       "cflags!": [ "-fno-exceptions" ],
       "cflags_cc!": [ "-fno-exceptions" ],
-      "include_dirs": [
- #       "<!@(node -p \"require('node-addon-api').include\")",
-        "/usr/include/samba-4.0",
-        "/usr/include/node/"
+      "conditions": [
+        ["OS=='mac'", {
+          "variables": {
+            "homebrew_prefix%": "<!@(node -e \"const os = require('os'); const arch = os.arch(); console.log(arch === 'arm64' ? '/opt/homebrew' : '/usr/local');\")"
+          },
+          "include_dirs": [
+            "<(homebrew_prefix)/include/samba-4.0",
+            "<(homebrew_prefix)/include"
+          ],
+          "link_settings": {
+            "libraries": [
+              "-L<(homebrew_prefix)/lib",
+              "-lsmbclient"
+            ]
+          },
+          "xcode_settings": {
+            "GCC_ENABLE_CPP_EXCEPTIONS": "YES",
+            "CLANG_CXX_LIBRARY": "libc++",
+            "MACOSX_DEPLOYMENT_TARGET": "10.7",
+            "OTHER_LDFLAGS": [
+              "-L<(homebrew_prefix)/lib"
+            ]
+          }
+        }],
+        ["OS=='linux'", {
+          "include_dirs": [
+            "/usr/include/samba-4.0",
+            "/usr/include/node/"
+          ],
+          "libraries": [
+            "/usr/lib/x86_64-linux-gnu/libsmbclient.so"
+          ]
+        }]
       ],
-      "libraries": [
-        "/usr/lib/x86_64-linux-gnu/libsmbclient.so"
-      ],
-      # "defines": [ "NAPI_DISABLE_CPP_EXCEPTIONS" ],
-#      "dependencies": ["<!(node -p \"require('node-addon-api').gyp\")"],
-      "xcode_settings": {
-        "GCC_ENABLE_CPP_EXCEPTIONS": "YES",
-        "CLANG_CXX_LIBRARY": "libc++",
-        "MACOSX_DEPLOYMENT_TARGET": "10.7"
-      },
       "msvs_settings": {
-        "VCCLCompilerTool": { "ExceptionHandling": 1 },
+        "VCCLCompilerTool": { "ExceptionHandling": 1 }
       }
     }
   ]

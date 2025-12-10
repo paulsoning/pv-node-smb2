@@ -10,7 +10,24 @@ This library calls the C libraries for libsmbclient to read and search through d
 
 The original fork was unable to connect to newer servers, and rather than hacking about with the smb2 protocol, it is far easier to 
 leverage the great work of the samba team, and use their libsmbclient library via NAPI bindings.
-This is much quicker than other wrappers that fork/exec smbclient, and the only OS pre-req (on Linux) is to install the libsmbclient-dev package.
+This is much quicker than other wrappers that fork/exec smbclient, and the only OS pre-req is to install the libsmbclient library.
+
+## Prerequisites
+
+### macOS
+Install samba via Homebrew:
+```bash
+brew install samba
+```
+
+### Linux
+Install the libsmbclient development package:
+```bash
+sudo apt-get install libsmbclient-dev  # Debian/Ubuntu
+# or
+sudo yum install libsmbclient-devel     # RHEL/CentOS
+```
+
 ## Installation
 
 ```bash
