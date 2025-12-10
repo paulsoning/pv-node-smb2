@@ -90,4 +90,21 @@ export class PvNodeSmb2 {
   renameFileSync(oldSmbPath:string, newSmbPath: string): number{
     return pv.pvRenameOnContext(this.ctx,oldSmbPath,newSmbPath)
   }
+
+  /**
+   * Unlink (delete) a file on the samba share
+   * @param smbPath - Smb uri of the file to delete, ex: 'smb://<host or IP>/Windows Path/goes/here/foo.txt'
+   * @returns Number 0 if successful
+   * @beta
+   */
+  unlinkFileSync(smbPath:string): number{
+    return pv.pvUnlinkOnContext(this.ctx,smbPath)
+  }
+
+  /**
+   * Alias for unlinkFileSync
+   */
+  deleteFileSync(smbPath:string): number{
+    return this.unlinkFileSync(smbPath)
+  }
 }
