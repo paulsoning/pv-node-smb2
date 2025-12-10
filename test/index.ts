@@ -8,20 +8,26 @@ const main = async () => {
         process.env.PV_USERNAME ||'user', 
         process.env.PV_PASSWORD ||'password')
 
-    const content = smb2Client.readFileSync(process.env.PV_SMB_URL||'smb://<host or IP>/Windows Path/goes/here/foo.txt')
+    const smbUrl = process.env.PV_SMB_URL||'smb://<host or IP>/Windows Path/goes/here/foo.txt'
+
+    const content = smb2Client.readFileSync(smbUrl)
     console.log(content.toString('base64'))
 
-    const info = smb2Client.fileInfo(process.env.PV_SMB_URL||'smb://<host or IP>/Windows Path/goes/here/foo.txt')
+    const info = smb2Client.fileInfo(smbUrl)
     console.log (`${JSON.stringify(info)}`)
     
     const dataBuffer = Buffer.from("foo", "utf8");
-    const write = smb2Client.writeFileSync(process.env.PV_SMB_URL||'smb://<host or IP>/Windows Path/goes/here/foo.txt', dataBuffer)
+    const write = smb2Client.writeFileSync(smbUrl, dataBuffer)
     console.log (write.toString())
 
-    const oldPath = "smb://<host or IP>/Windows Path/goes/here/foo.txt"
-    const newPath = "smb://<host or IP>/Windows Path/goes/here/bar.txt"
+    const oldPath = smbUrl
+    const newPath = (process.env.PV_SMB_URL_NEW||'smb://<host or IP>/Windows Path/goes/here/bar.txt')
     const rename = smb2Client.renameFileSync(oldPath, newPath)
     console.log (rename.toString())
+
+    // Unlink (delete) the newly renamed file
+    const unlink = smb2Client.unlinkFileSync(newPath)
+    console.log(unlink.toString())
 }
 
 
